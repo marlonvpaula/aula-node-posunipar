@@ -11,6 +11,20 @@ app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 
+const cors = (req, res, next) => {
+    const whitelist = [
+        'http://localhost:8080'
+    ];
+    const origin = req.header.origin;
+    if (whitelist.indexOf(origin) > -1) {
+        res.setHeader('Access-Control-Allow-Origin', '*');
+    }
+    res.setHeader('Access-Control-Allow-Methods', 'GET,PUT,PATCH,POST,DELETE');
+    res.setHeader('Access-Control-Allow-Headers', 'token,Content-Type,Authorization, x-access-token');
+    next();
+}
+app.use(cors);
+
 app.use('/products', productRoutes);
 app.use('/orders', orderRoutes);
 
