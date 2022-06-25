@@ -1,21 +1,55 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const router = express.Router();
 
-router.get('/', (req, res, next) => {
-    res.status(200).json({
-        message: 'Test GET request to /orders'
-    })
+const OrderModel = mongoose.model('Order');
+
+router.get('/', async (req, res, next) => {
+    try {
+        const orders = await OrderModel.find({});
+
+        res.status(200).json({
+            count: orders.length,
+            orders: orders.map(order => {
+                return {
+                    product: order.product,
+                    quantity: order.quantity,
+                    request: {
+                        type: "GET",
+                        url: "http://localhost:3000/orders/" + order._id
+                    }
+                }
+            })
+        })
+    } catch (err) {
+        console.log(err);
+        res.status(500).json(err);
+    }
 });
 
-router.post('/', (req, res, next) => {
-    const order = {
-        product_id: req.body.productId,
-        quantity: req.body.quantity
+router.post('/', async (req, res, next) => {
+    try {
+        let order = new OrderModel ({
+            product: req.body.productId,
+            quantity: req.body.quantity
+        });
+        order = await order.save();
+        res.status(201).json({
+            message: 'Ordem criada com sucesso!',
+            createdOrder: {
+                product: order.product,
+                quantity: order.quantity,
+                _id: order._id,
+                request: {
+                    type: "GET",
+                    url: "http://localhost:3000/orders/" + order._id
+                }
+            }
+        })
+    } catch (err) {
+        console.log(err);
+        res.status(500).json(err);
     }
-    res.status(201).json({
-        message: 'Test POST request to /orders',
-        order: order
-    })
 });
 
 
