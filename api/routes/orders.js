@@ -4,8 +4,9 @@ const router = express.Router();
 
 const OrderModel = mongoose.model('Order');
 const ProductModel = mongoose.model('Product');
+const controllerUser = require('../controllers/user-controller');
 
-router.get('/', async (req, res, next) => {
+router.get('/', controllerUser.verifyJWT, async (req, res, next) => {
     try {
         const orders = await OrderModel.find({}).populate('product', 'name');
 

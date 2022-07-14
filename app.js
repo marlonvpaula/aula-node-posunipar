@@ -3,6 +3,7 @@ const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const passport = require('passport');
+const swaggerUi = require('swagger-ui-express');
 
 mongoose.connect(process.env.MONGODB_URI,
     {
@@ -51,6 +52,10 @@ app.use(cors);
 app.use('/products', productRoutes);
 app.use('/orders', orderRoutes);
 app.use('/users', userRoutes);
+
+let swaggerSpec = require('./api/config/swagger');
+app.use('/api-docs', swaggerUi.serve, 
+         swaggerUi.setup(swaggerSpec));
 
 
 app.use('/api', (req, res, next) => {
